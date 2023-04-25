@@ -83,7 +83,7 @@ func TestCommand(t *testing.T) {
 
 	// Getparam command
 	t.Log("'Getparam' command")
-	res, err = com.Exec("Getparam","parameter")
+	res, err = com.Exec([]byte("Getparam parameter"))
 	showResult(res, err)
 	if err != nil {
 		t.Error(err)

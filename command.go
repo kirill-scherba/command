@@ -124,32 +124,13 @@ func (c Command) Get(name string) (commandData *CommandData, ok bool) {
 }
 
 // Exec executes command
-func (c Command) Exec(cmd ...interface{}) (result []byte, err error) {
+func (c Command) Exec(cmd []byte) (result []byte, err error) {
 
-	errWrongParameters := fmt.Errorf("name should be set")
-
-	if len(cmd) == 0 {
-		err = errWrongParameters
-		return
-	}
-
-	var params []string
-	switch v := cmd[0].(type) {
-	// Split command data by space
-	case []byte:
-		params = strings.Fields(string(v))
-	case []string:
-		params = v
-	case string:
-		// params = append(params, v)
-		// for i := range cmd {
-		// 	//i
-		// }
-	}
+	params := strings.Fields(string(cmd))
 
 	// Check name set
 	if len(params) == 0 {
-		err = errWrongParameters
+		err = fmt.Errorf("name should be set")
 		return
 	}
 	name := strings.ToLower(params[0])
