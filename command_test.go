@@ -24,9 +24,9 @@ func TestCommand(t *testing.T) {
 
 		// Get some text commands
 		{
-			name:  "get",
-			usage: "return some text",
-			cmd: func(params ...string) (res []byte, err error) {
+			Name:  "get",
+			Usage: "return some text",
+			Cmd: func(params ...string) (res []byte, err error) {
 				res = []byte("this is some text")
 				return
 			},
@@ -34,10 +34,10 @@ func TestCommand(t *testing.T) {
 
 		// Get some text wit parameter commands
 		{
-			name:   "Getparam",
-			usage:  "return some text",
-			params: []ParamData{{"<param1>", "simple parameter"}},
-			cmd: func(params ...string) (res []byte, err error) {
+			Name:   "Getparam",
+			Usage:  "return some text",
+			Params: []ParamData{{"<param1>", "simple parameter"}},
+			Cmd: func(params ...string) (res []byte, err error) {
 				res = []byte(fmt.Sprintf("this is some text with %s", params[0]))
 				return
 			},

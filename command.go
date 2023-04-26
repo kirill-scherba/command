@@ -18,14 +18,14 @@ type Command struct {
 }
 type CommandMap map[string]*CommandData
 type CommandData struct {
-	name   string
-	usage  string
-	params []ParamData
-	cmd    CommandFunc
+	Name   string
+	Usage  string
+	Params []ParamData
+	Cmd    CommandFunc
 }
 type ParamData struct {
-	name  string
-	usage string
+	Name  string
+	Usage string
 }
 type CommandFunc func(params ...string) ([]byte, error)
 
@@ -41,9 +41,9 @@ func New() (c *Command) {
 // addHelp add predefined help command
 func (c *Command) addHelp() {
 	c.Add(&CommandData{
-		name:  "help",
-		usage: "show this help message",
-		cmd: func(params ...string) (res []byte, err error) {
+		Name:  "help",
+		Usage: "show this help message",
+		Cmd: func(params ...string) (res []byte, err error) {
 			res = []byte(fmt.Sprintf("\nUsage of commands:\n%s", c))
 			return
 		},
@@ -65,15 +65,15 @@ func (c Command) String() (usage string) {
 		if i > 0 {
 			usage += NEW_LINE
 		}
-		usage += INDENT + c.commands[i].name
-		for j := range c.commands[i].params {
-			usage += " " + c.commands[i].params[j].name
+		usage += INDENT + c.commands[i].Name
+		for j := range c.commands[i].Params {
+			usage += " " + c.commands[i].Params[j].Name
 		}
-		usage += DASH + c.commands[i].usage
-		for j := range c.commands[i].params {
+		usage += DASH + c.commands[i].Usage
+		for j := range c.commands[i].Params {
 			usage += NEW_LINE +
-				INDENT + INDENT + c.commands[i].params[j].name +
-				DASH + c.commands[i].params[j].usage
+				INDENT + INDENT + c.commands[i].Params[j].Name +
+				DASH + c.commands[i].Params[j].Usage
 		}
 	}
 
@@ -90,13 +90,13 @@ func (c *Command) Add(cmds ...*CommandData) (err error) {
 			err = fmt.Errorf("command pointer is nil")
 			return
 		}
-		if len(cmd.name) == 0 {
+		if len(cmd.Name) == 0 {
 			err = fmt.Errorf("command name is empty")
 			return
 		}
-		cmd.name = strings.ToLower(cmd.name)
+		cmd.Name = strings.ToLower(cmd.Name)
 		c.findAndReplace(cmd)
-		c.m[cmd.name] = cmd
+		c.m[cmd.Name] = cmd
 	}
 
 	return
@@ -106,7 +106,7 @@ func (c *Command) Add(cmds ...*CommandData) (err error) {
 // or add to array if not exists
 func (c *Command) findAndReplace(cmd *CommandData) {
 	for i := range c.commands {
-		if c.commands[i].name == cmd.name {
+		if c.commands[i].Name == cmd.Name {
 			c.commands[i] = cmd
 			return
 		}
@@ -144,12 +144,12 @@ func (c Command) Exec(cmd []byte) (result []byte, err error) {
 	}
 
 	// Check command function defined
-	if commandData.cmd == nil {
+	if commandData.Cmd == nil {
 		err = fmt.Errorf("command %s is not defined", name)
 		return
 	}
 
 	// Execute command
-	result, err = commandData.cmd(params...)
+	result, err = commandData.Cmd(params...)
 	return
 }
