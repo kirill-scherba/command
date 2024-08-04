@@ -9,26 +9,56 @@ package command
 import "strings"
 
 const (
-	HTTP ProcessIn = 1 << iota
-	TRU
-	WebRTC
+	HTTP   ProcessIn = 1 << iota // HTTP request
+	TRU                          // TRU request
+	WebRTC                       // WebRTC request
+	Teonet                       // Teonet request
 )
 
+// ProcessIn represents the source of a command.
 type ProcessIn byte
 
-func (p ProcessIn) String() string {
+// String returns a string representation of the ProcessIn.
+//
+// The string representation includes the names of the sources separated by commas.
+// If the source is unknown, it is omitted from the result.
+// The result is lowercased and trimmed of trailing commas.
+func (pi ProcessIn) String() string {
+	// Create a strings.Builder to efficiently build the result string.
+	var sb strings.Builder
 
-	var s string
-	if p&HTTP != 0 {
-		s += "HTTP, "
+	// Check each bit of the ProcessIn byte and append the corresponding source name
+	// to the strings.Builder if the bit is set.
+
+	// HTTP source
+	if pi&HTTP != 0 {
+		sb.WriteString("HTTP, ")
 	}
-	if p&TRU != 0 {
-		s += "TRU, "
+
+	// TRU source
+	if pi&TRU != 0 {
+		sb.WriteString("TRU, ")
 	}
-	if p&WebRTC != 0 {
-		s += "WebRTC, "
+
+	// WebRTC source
+	if pi&WebRTC != 0 {
+		sb.WriteString("WebRTC, ")
 	}
-	s = strings.Trim(s, ", ")
-	s = strings.ToLower(s)
-	return s
+
+	// Teonet source
+	if pi&Teonet != 0 {
+		sb.WriteString("Teonet, ")
+	}
+
+	// Get the result string from the strings.Builder.
+	result := sb.String()
+
+	// Trim the trailing comma and space from the result string.
+	result = strings.TrimRight(result, ", ")
+
+	// Convert the result string to lowercase.
+	result = strings.ToLower(result)
+
+	// Return the result string.
+	return result
 }
