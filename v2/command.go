@@ -94,10 +94,11 @@ func (c *Commands) Vars(indata any) (map[string]string, error) {
 
 // Add adds command to commands map.
 func (c *Commands) Add(command, descr string, processIn ProcessIn, params string,
-	handler CommandHandler) {
+	handler CommandHandler) *Commands {
 	c.Lock()
 	c.m[command] = &CommandData{command, processIn, params, descr, handler}
 	c.Unlock()
+	return c
 }
 
 // get returns CommandData from commands map by name.
