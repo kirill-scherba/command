@@ -13,6 +13,8 @@ const (
 	TRU                          // TRU request
 	WebRTC                       // WebRTC request
 	Teonet                       // Teonet request
+	WS                           // Websocket request
+	All    = HTTP | TRU | WebRTC | Teonet | WS
 )
 
 // ProcessIn represents the source of a command.
@@ -48,6 +50,11 @@ func (pi ProcessIn) String() string {
 	// Teonet source
 	if pi&Teonet != 0 {
 		sb.WriteString("Teonet, ")
+	}
+
+	// Websocket source
+	if pi&WS != 0 {
+		sb.WriteString("Websocket, ")
 	}
 
 	// Get the result string from the strings.Builder.

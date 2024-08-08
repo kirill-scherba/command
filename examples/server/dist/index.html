@@ -1,0 +1,38 @@
+Commands<br>
+<br>
+<a href="./api/v1/hello/Commands">HTTP 'hello' command</a><br>
+<a href="./api/v1/version">HTTP 'version' command</a><br>
+<a href="./api/v1/commands">List of commands</a><br>
+<br>
+Send WebSocket command:<br>
+<input type="text" id="command">
+<button onclick="sendCommand()">Send</button><br>
+<br>
+WebSocket server answer:<br>
+<div id="response"></div>
+
+<script>
+    let ws = new WebSocket("ws://localhost:8084/ws");
+    ws.onopen = () => {
+        console.log("WebSocket connection established");
+    }
+    ws.onmessage = (event) => {
+        console.log("Received message: " + event.data);
+        document.getElementById("response").innerHTML = event.data;
+    }
+    ws.onclose = () => {
+        console.log("WebSocket connection closed");
+    }
+
+    // Send a message to the server on the WebSocket connection 
+    ws.onopen = function () {
+        ws.send("hello/client");
+    }
+
+    function sendCommand() {
+        let command = document.getElementById("command").value;
+        ws.send(command);
+        console.log("Sent command: " + command);
+    }
+
+</script>

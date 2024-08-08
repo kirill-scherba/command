@@ -49,7 +49,7 @@ func (a *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 		a.Add("commands", "Get html list of commands.", processIn, "", handler)
 		if setFieldset {
 			a.Add("commfilt", "Get html list of commands with filter.", processIn,
-				"{http}/{webrtc}/{tru}", handler)
+				"{http}/{webrtc}/{tru}/{ws}", handler)
 		}
 	}
 }
@@ -100,6 +100,9 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 	
 		<input type="checkbox" id="tru" name="tru" onclick="onClickHandler()" checked />
 		<label for="horns">Tru</label>
+
+		<input type="checkbox" id="websocket" name="websocket" onclick="onClickHandler()" checked />
+		<label for="horns">Websocket</label>
 	</div>
 	</fieldset>
 	<br/>
@@ -129,6 +132,9 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 
 		const tru = "{{.Filter.ProcessIn.Tru}}";
 		document.getElementById("tru").checked = tru=="true";
+
+		const ws = "{{.Filter.ProcessIn.Websocket}}";
+		document.getElementById("websocket").checked = ws=="true";
 	}
 	setValues();
 	</script>
@@ -148,12 +154,13 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 		var chkHttp = document.getElementById("http").checked;
 		var chkWebrtc = document.getElementById("webrtc").checked;
 		var chkTru = document.getElementById("tru").checked;
+		var chkWs = document.getElementById("websocket").checked;
 
-		if (chkHttp && chkWebrtc && chkTru/* || !chkHttp && !chkWebrtc && !chkTru */) {
+		if (chkHttp && chkWebrtc && chkTru && chkWs) {
 			window.location = '/commands';
 			return;
 		}
-		window.location = '/commfilt/'+chkHttp+'/'+chkWebrtc+'/'+chkTru;
+		window.location = '/commfilt/'+chkHttp+'/'+chkWebrtc+'/'+chkTru+'/'+chkWs;
 	}
 	</script>
 
@@ -176,9 +183,10 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 		List   []commandsListItem
 		Filter struct {
 			ProcessIn struct {
-				Http   bool
-				Webrtc bool
-				Tru    bool
+				Http      bool
+				Webrtc    bool
+				Tru       bool
+				Websocket bool
 			}
 		}
 	}
@@ -190,13 +198,15 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 	page.Filter.ProcessIn.Http = vars["http"] != "false"
 	page.Filter.ProcessIn.Webrtc = vars["webrtc"] != "false"
 	page.Filter.ProcessIn.Tru = vars["tru"] != "false"
+	page.Filter.ProcessIn.Websocket = vars["websocket"] != "false"
 
 	// Get list of commands depending on filter
 	a.ForEach(func(command string, cmd *CommandData) {
 		// Check processing filter
 		if page.Filter.ProcessIn.Http && cmd.ProcessIn&HTTP != 0 ||
 			page.Filter.ProcessIn.Webrtc && cmd.ProcessIn&WebRTC != 0 ||
-			page.Filter.ProcessIn.Tru && cmd.ProcessIn&TRU != 0 {
+			page.Filter.ProcessIn.Tru && cmd.ProcessIn&TRU != 0 ||
+			page.Filter.ProcessIn.Websocket && cmd.ProcessIn&WS != 0 {
 
 			page.List = append(page.List, commandsListItem{
 				command, cmd.Params, cmd.ProcessIn.String(), cmd.Descr,
