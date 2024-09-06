@@ -67,7 +67,11 @@ type CommandHandler func(cmd *CommandData, processIn ProcessIn, data any) ([]byt
 
 // RequestInterface is commont type of Requesr interface.
 type RequestInterface interface {
-	GetVars() map[string]string // GetVars returns map of request variables.
+	// GetVars returns map of request variables.
+	GetVars() map[string]string
+
+	// GetData returns request data.
+	GetData() []byte
 }
 
 // ParseParams parses the input data command parameters.
@@ -119,6 +123,15 @@ func (c *Commands) Vars(indata any) (map[string]string, error) {
 		return nil, err
 	}
 	return req.GetVars(), nil
+}
+
+// Data returns data parameter from input data.
+func (c *Commands) Data(indata any) ([]byte, error) {
+	req, err := ParseParams[RequestInterface](indata)
+	if err != nil {
+		return nil, err
+	}
+	return req.GetData(), nil
 }
 
 // Add adds command to commands map.
@@ -220,19 +233,19 @@ func (c *Commands) HabdleCommands(processIn ProcessIn,
 
 // ParseCommand parses the command data.
 //
-// It takes a byte slice 'data' representing the command data and returns the 
+// It takes a byte slice 'data' representing the command data and returns the
 // command name and a map of variables.
 //
-// The function splits the 'data' by the '/' character and extracts the command 
-// name. It then retrieves the command data for the command name from the 
-// Commands struct. If the command is not found, it returns an empty name and 
+// The function splits the 'data' by the '/' character and extracts the command
+// name. It then retrieves the command data for the command name from the
+// Commands struct. If the command is not found, it returns an empty name and
 // an empty map of variables.
 //
-// The function then splits the remaining command parameters by the '/' 
-// character and creates a map of variables. Each variable is a key-value pair, 
+// The function then splits the remaining command parameters by the '/'
+// character and creates a map of variables. Each variable is a key-value pair,
 // where the key is the parameter name and the value is the parameter value.
 //
-// ***A value with slashes is processed successfully only in the last parameter 
+// ***A value with slashes is processed successfully only in the last parameter
 // in 'data'.
 func (c *Commands) ParseCommand(data []byte) (name string, vars map[string]string) {
 
@@ -266,7 +279,7 @@ func (c *Commands) ParseCommand(data []byte) (name string, vars map[string]strin
 	// If there are command parameters, create a map of variables
 	if len(cmdParams) > 0 {
 
-		// Split the command parameters by '/' character and create a map of 
+		// Split the command parameters by '/' character and create a map of
 		// variables
 		for i, v := range bytes.SplitN(cmdParams, []byte("/"), len(params)) {
 			vars[params[i]] = string(v)
