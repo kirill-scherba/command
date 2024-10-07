@@ -45,14 +45,14 @@ func (a *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 	}
 
 	a.Add("commjson", "Get json list of commands.", processIn,
-		"", "json list of commands", handlerJson)
+		"", "json list of commands", "", "", handlerJson)
 	if processIn&HTTP != 0 {
 		returnDesc := "HTML list of commands"
 		a.Add("commands", "Get html list of commands.", processIn,
-			"", returnDesc, handler)
+			"", returnDesc, "", "", handler)
 		if setFieldset {
 			a.Add("commfilt", "Get html list of commands with filter.", processIn,
-				"{http}/{webrtc}/{tru}/{ws}", returnDesc, handler)
+				"{http}/{webrtc}/{tru}/{ws}", returnDesc, "", "", handler)
 		}
 	}
 }
@@ -64,6 +64,8 @@ type commandsListItem struct {
 	Return    string `json:"return"`
 	ProcessIn string `json:"processIn"`
 	Descr     string `json:"descr"`
+	Request   string `json:"request"`
+	Response  string `json:"response"`
 }
 
 // commandsJsonHandler returns array of commands in json format.
@@ -75,6 +77,7 @@ func (a *Commands) commandsJsonHandler() ([]byte, error) {
 	a.ForEach(func(command string, cmd *CommandData) {
 		list = append(list, commandsListItem{
 			command, cmd.Params, cmd.Return, cmd.ProcessIn.String(), cmd.Descr,
+			cmd.Request, cmd.Response,
 		})
 
 	})
@@ -215,6 +218,7 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 
 			page.List = append(page.List, commandsListItem{
 				command, cmd.Params, cmd.Return, cmd.ProcessIn.String(), cmd.Descr,
+				cmd.Request, cmd.Response,
 			})
 		}
 	})

@@ -33,6 +33,8 @@ type CommandData struct {
 	Params    string         // Parameters
 	Return    string         // Return description
 	Descr     string         // Command description
+	Request   string         // Request example
+	Response  string         // Response example
 	Handler   CommandHandler // Command handler
 }
 
@@ -136,10 +138,25 @@ func (c *Commands) Data(indata any) ([]byte, error) {
 }
 
 // Add adds command to commands map.
+//
+// Parameters:
+//   - command: The name of the command.
+//   - descr: A short description of the command.
+//   - processIn: The type of input processing to use for the command.
+//   - params: The parameters expected by the command.
+//   - returnDescr: A description of the data returned by the command.
+//   - request: The request example.
+//   - response: The response example.
+//   - handler: The function that handles the command.
+//
+// Returns:
+// - *Commands: The Commands object itself.
 func (c *Commands) Add(command, descr string, processIn ProcessIn, params,
-	returnDescr string, handler CommandHandler) *Commands {
+	returnDescr, request, response string, handler CommandHandler) *Commands {
 	c.Lock()
-	c.m[command] = &CommandData{command, processIn, params, returnDescr, descr, handler}
+	c.m[command] = &CommandData{
+		command, processIn, params, returnDescr, descr, request, response, handler,
+	}
 	c.Unlock()
 	return c
 }

@@ -8,7 +8,7 @@ import (
 func TestParseCommand(t *testing.T) {
 
 	c := New()
-	c.Add("test", "test", HTTP, "{param1}/{param2}/{param3}", "",
+	c.Add("test", "test", HTTP, "{param1}/{param2}/{param3}", "", "", "",
 		func(cmd *CommandData, processIn ProcessIn, data any) ([]byte, error) {
 			return []byte("test"), nil
 		},
