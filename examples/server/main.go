@@ -61,7 +61,7 @@ func main() {
 func commands(c *command.Commands) {
 
 	// Add 'hello' commands
-	c.Add("hello", "say hello", command.HTTP|command.WS, "{name}",
+	c.Add("hello", "say hello", command.HTTP|command.WS, "{name}", "",
 		func(cmd *command.CommandData, processIn command.ProcessIn, data any) (
 			[]byte, error) {
 
@@ -79,7 +79,7 @@ func commands(c *command.Commands) {
 	)
 
 	// Add 'version' commands
-	c.Add("version", "get application version", command.HTTP|command.WS, "",
+	c.Add("version", "get application version", command.HTTP|command.WS, "", "",
 		func(cmd *command.CommandData, processIn command.ProcessIn, data any) (
 			[]byte, error) {
 

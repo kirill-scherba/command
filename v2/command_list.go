@@ -44,12 +44,15 @@ func (a *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 		return a.commandsJsonHandler()
 	}
 
-	a.Add("commjson", "Get json list of commands.", processIn, "", handlerJson)
+	a.Add("commjson", "Get json list of commands.", processIn,
+		"", "json list of commands", handlerJson)
 	if processIn&HTTP != 0 {
-		a.Add("commands", "Get html list of commands.", processIn, "", handler)
+		returnDesc := "HTML list of commands"
+		a.Add("commands", "Get html list of commands.", processIn,
+			"", returnDesc, handler)
 		if setFieldset {
 			a.Add("commfilt", "Get html list of commands with filter.", processIn,
-				"{http}/{webrtc}/{tru}/{ws}", handler)
+				"{http}/{webrtc}/{tru}/{ws}", returnDesc, handler)
 		}
 	}
 }
@@ -58,6 +61,7 @@ func (a *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 type commandsListItem struct {
 	Command   string `json:"command"`
 	Params    string `json:"params"`
+	Return    string `json:"return"`
 	ProcessIn string `json:"processIn"`
 	Descr     string `json:"descr"`
 }
@@ -70,7 +74,7 @@ func (a *Commands) commandsJsonHandler() ([]byte, error) {
 	// Get list of commands
 	a.ForEach(func(command string, cmd *CommandData) {
 		list = append(list, commandsListItem{
-			command, cmd.Params, cmd.ProcessIn.String(), cmd.Descr,
+			command, cmd.Params, cmd.Return, cmd.ProcessIn.String(), cmd.Descr,
 		})
 
 	})
@@ -144,6 +148,7 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 		<div class="command">{{.Command}}</div>
 		<div class="descr">{{.Descr}}</div>{{if .Params}}
 		<div class="params">params: {{.Params}}</div>{{end}}
+		<div class="params">return: {{.Return}}</div>{{end}}
 		<div class="params">processing in: {{.ProcessIn}}</div>
 		<br/>
 	{{end}}
@@ -209,7 +214,7 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 			page.Filter.ProcessIn.Websocket && cmd.ProcessIn&WS != 0 {
 
 			page.List = append(page.List, commandsListItem{
-				command, cmd.Params, cmd.ProcessIn.String(), cmd.Descr,
+				command, cmd.Params, cmd.Return, cmd.ProcessIn.String(), cmd.Descr,
 			})
 		}
 	})

@@ -31,6 +31,7 @@ type CommandData struct {
 	Cmd       string         // Command name
 	ProcessIn ProcessIn      // Input processing types
 	Params    string         // Parameters
+	Return    string         // Return description
 	Descr     string         // Command description
 	Handler   CommandHandler // Command handler
 }
@@ -135,10 +136,10 @@ func (c *Commands) Data(indata any) ([]byte, error) {
 }
 
 // Add adds command to commands map.
-func (c *Commands) Add(command, descr string, processIn ProcessIn, params string,
-	handler CommandHandler) *Commands {
+func (c *Commands) Add(command, descr string, processIn ProcessIn, params,
+	returnDescr string, handler CommandHandler) *Commands {
 	c.Lock()
-	c.m[command] = &CommandData{command, processIn, params, descr, handler}
+	c.m[command] = &CommandData{command, processIn, params, returnDescr, descr, handler}
 	c.Unlock()
 	return c
 }
