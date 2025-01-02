@@ -25,6 +25,10 @@ func (r *HttpRequest) GetVars() map[string]string {
 	return r.Vars
 }
 
+func (r *HttpRequest) GetData() []byte {
+	return nil
+}
+
 func serve(c *command.Commands) {
 	// Create a mux for routing incoming requests
 	m := mux.NewRouter()

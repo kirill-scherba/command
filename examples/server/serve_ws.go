@@ -25,6 +25,10 @@ func (r *WsRequest) GetVars() map[string]string {
 	return r.Vars
 }
 
+func (r *WsRequest) GetData() []byte {
+	return nil
+}
+
 // ServeWs handles and processes HTTP websocket commands.
 type ServeWs struct {
 	c    *command.Commands
