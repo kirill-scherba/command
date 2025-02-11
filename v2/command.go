@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 )
 
 // ErrIncorrectInputData is an error returned when the input data provided is
@@ -75,6 +76,10 @@ type RequestInterface interface {
 
 	// GetData returns request data.
 	GetData() []byte
+
+	// Setd date to responce. Used in HTTP request and set custom date to HTTP
+	// writer.
+	SetDate(date time.Time)
 }
 
 // ParseParams parses the input data command parameters.
@@ -135,6 +140,16 @@ func (c *Commands) Data(indata any) ([]byte, error) {
 		return nil, err
 	}
 	return req.GetData(), nil
+}
+
+// SetDate sets date in responce. Used in HTTP request and set custom date to
+// HTTP writer.
+func (c *Commands) SetDate(indata any, date time.Time) {
+	req, err := ParseParams[RequestInterface](indata)
+	if err != nil {
+		return
+	}
+	req.SetDate(date)
 }
 
 // Add adds command to commands map.
