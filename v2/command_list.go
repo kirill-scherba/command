@@ -13,10 +13,21 @@ import (
 	"sort"
 )
 
+// Page item struct
+type commandsListItem struct {
+	Command   string `json:"command"`
+	Params    string `json:"params"`
+	Return    string `json:"return"`
+	ProcessIn string `json:"processIn"`
+	Descr     string `json:"descr"`
+	Request   string `json:"request"`
+	Response  string `json:"response"`
+}
+
 // AddCommandsList adds commands list command. The commands list command return
 // list of all commands of this server in text format. The input function f
 // should convert indata to map[string]string.
-func (a *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
+func (c *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 
 	// Check setFieldset
 	setFieldset := true
@@ -29,11 +40,11 @@ func (a *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 	handler := func(command *CommandData, processIn ProcessIn, indata any) (
 		[]byte, error) {
 
-		vars, err := a.Vars(indata)
+		vars, err := c.Vars(indata)
 		if err != nil {
 			return nil, err
 		}
-		return a.commandsHttpHandler(setFieldset, vars)
+		return c.commandsHttpHandler(setFieldset, vars)
 	}
 
 	// handlerJson converts input data to map[string]string and use it in
@@ -41,41 +52,30 @@ func (a *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 	handlerJson := func(command *CommandData, processIn ProcessIn, indata any) (
 		[]byte, error) {
 
-		return a.commandsJsonHandler()
+		return c.commandsJsonHandler()
 	}
 
-	a.Add("commjson", "Get json list of commands.", processIn,
+	c.Add("commjson", "Get json list of commands.", processIn,
 		"", "json list of commands", "", "", handlerJson)
 	if processIn&HTTP != 0 {
 		returnDesc := "HTML list of commands"
-		a.Add("commands", "Get html list of commands.", processIn,
+		c.Add("commands", "Get html list of commands.", processIn,
 			"", returnDesc, "", "", handler)
 		if setFieldset {
-			a.Add("commfilt", "Get html list of commands with filter.", processIn,
+			c.Add("commfilt", "Get html list of commands with filter.", processIn,
 				"{http}/{webrtc}/{tru}/{ws}", returnDesc, "", "", handler)
 		}
 	}
 }
 
-// Page item struct
-type commandsListItem struct {
-	Command   string `json:"command"`
-	Params    string `json:"params"`
-	Return    string `json:"return"`
-	ProcessIn string `json:"processIn"`
-	Descr     string `json:"descr"`
-	Request   string `json:"request"`
-	Response  string `json:"response"`
-}
-
 // commandsJsonHandler returns array of commands in json format.
-func (a *Commands) commandsJsonHandler() ([]byte, error) {
+func (c *Commands) commandsJsonHandler() ([]byte, error) {
 
 	// Output array of commands
 	var list []commandsListItem
 
 	// Get list of commands
-	for command, cmd := range a.Iter() {
+	for command, cmd := range c.Iter() {
 		list = append(list, commandsListItem{
 			command, cmd.Params, cmd.Return, cmd.ProcessIn.String(), cmd.Descr,
 			cmd.Request, cmd.Response,
@@ -91,7 +91,7 @@ func (a *Commands) commandsJsonHandler() ([]byte, error) {
 }
 
 // commandsHttpHandler returns list of commands in html format.
-func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string) ([]byte, error) {
+func (c *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string) ([]byte, error) {
 
 	var fieldset string
 
@@ -211,7 +211,7 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 	page.Filter.ProcessIn.Websocket = vars["websocket"] != "false"
 
 	// Get list of commands depending on filter
-	for command, cmd := range a.Iter() {
+	for command, cmd := range c.Iter() {
 		// Check processing filter
 		if page.Filter.ProcessIn.Http && cmd.ProcessIn&HTTP != 0 ||
 			page.Filter.ProcessIn.Webrtc && cmd.ProcessIn&WebRTC != 0 ||

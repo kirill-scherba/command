@@ -76,7 +76,7 @@ func (s *ServeWs) processMessage(conn *websocket.Conn, message []byte) {
 	log.Println("received message:", string(message))
 
 	// Parse message
-	name, vars := s.c.ParseCommand(message)
+	_, name, vars, _, _ := s.c.ParseCommand(message)
 
 	// Execute command
 	log.Println("executing command:", name, vars)
