@@ -1,3 +1,3 @@
 module github.com/kirill-scherba/command
 
-go 1.23.2
+go 1.24.0
