@@ -71,16 +71,18 @@ type commandsListItem struct {
 // commandsJsonHandler returns array of commands in json format.
 func (a *Commands) commandsJsonHandler() ([]byte, error) {
 
+	// Output array of commands
 	var list []commandsListItem
 
 	// Get list of commands
-	a.ForEach(func(command string, cmd *CommandData) {
+	for command, cmd := range a.Iter() {
 		list = append(list, commandsListItem{
 			command, cmd.Params, cmd.Return, cmd.ProcessIn.String(), cmd.Descr,
 			cmd.Request, cmd.Response,
 		})
+	}
 
-	})
+	// Sort output list
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].Command < list[j].Command
 	})
@@ -209,7 +211,7 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 	page.Filter.ProcessIn.Websocket = vars["websocket"] != "false"
 
 	// Get list of commands depending on filter
-	a.ForEach(func(command string, cmd *CommandData) {
+	for command, cmd := range a.Iter() {
 		// Check processing filter
 		if page.Filter.ProcessIn.Http && cmd.ProcessIn&HTTP != 0 ||
 			page.Filter.ProcessIn.Webrtc && cmd.ProcessIn&WebRTC != 0 ||
@@ -221,7 +223,9 @@ func (a *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 				cmd.Request, cmd.Response,
 			})
 		}
-	})
+	}
+
+	// Sort page list
 	sort.Slice(page.List, func(i, j int) bool {
 		return page.List[i].Command < page.List[j].Command
 	})

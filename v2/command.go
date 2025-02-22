@@ -8,6 +8,7 @@ package command
 import (
 	"bytes"
 	"fmt"
+	"iter"
 	"strings"
 	"sync"
 	"time"
@@ -229,6 +230,10 @@ func (c *Commands) Exec(command string, processIn ProcessIn, data any) (
 //	commands.ForEach(func(command string, cmd *CommandData) {
 //	    fmt.Println(command)
 //	})
+//
+// Deprecated: This method is deprecated and will be removed in the future.
+// Use Iter instead.
+//go:deprecated
 func (c *Commands) ForEach(f func(command string, cmd *CommandData)) {
 	// Lock the commands map for reading to prevent concurrent modifications
 	c.RLock()
@@ -237,6 +242,23 @@ func (c *Commands) ForEach(f func(command string, cmd *CommandData)) {
 	// Iterate over the commands map and call the given function for each command
 	for command, cmd := range c.m {
 		f(command, cmd)
+	}
+}
+
+// Iter returns an iterator for the commands map.
+//
+// This function is safe for concurrent read access. But all write Commands
+// methods will lock during iteration.
+func (c *Commands) Iter() iter.Seq2[string, *CommandData] {
+	return func(yield func(string, *CommandData) bool) {
+		c.RLock()
+		defer c.RUnlock()
+
+		for command, cmd := range c.m {
+			if !yield(command, cmd) {
+				return
+			}
+		}
 	}
 }
 
@@ -257,11 +279,11 @@ func (c *Commands) ForEach(f func(command string, cmd *CommandData)) {
 func (c *Commands) HabdleCommands(processIn ProcessIn,
 	h func(command, params string)) {
 
-	c.ForEach(func(command string, cmd *CommandData) {
+	for command, cmd := range c.Iter() {
 		if cmd.ProcessIn&processIn != 0 && cmd.Handler != nil {
 			h(command, cmd.Params)
 		}
-	})
+	}
 }
 
 // ParseCommand parses the command data.
