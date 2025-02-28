@@ -6,7 +6,11 @@
 
 package command
 
-import "time"
+import (
+	"time"
+
+	"github.com/kirill-scherba/command/v2/subscription"
+)
 
 // RequestInterface is commont type of Requesr interface.
 type RequestInterface interface {
@@ -15,6 +19,9 @@ type RequestInterface interface {
 
 	// GetData returns request data.
 	GetData() []byte
+
+	// GetConnectionChannel returns connection channel.
+	GetConnectionChannel() subscription.ConnectionChannel
 
 	// SetDate sets date to responce. Used in HTTP request and set custom date
 	// to HTTP writer.
@@ -64,6 +71,15 @@ func (c *Commands) Data(indata any) ([]byte, error) {
 		return nil, err
 	}
 	return req.GetData(), nil
+}
+
+// ConnectionChannel returns connection channel from input data.
+func (c *Commands) ConnectionChannel(indata any) (subscription.ConnectionChannel, error) {
+	req, err := ParseParams[RequestInterface](indata)
+	if err != nil {
+		return nil, err
+	}
+	return req.GetConnectionChannel(), nil
 }
 
 // SetDate sets date in responce. Used in HTTP request and set custom date to
