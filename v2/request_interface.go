@@ -74,12 +74,24 @@ func (c *Commands) Data(indata any) ([]byte, error) {
 }
 
 // ConnectionChannel returns connection channel from input data.
+//
+// The error ErrIncorrectInputData is returned if the input data is not of type
+// RequestInterface.
+//
+// Not all connection implemented subscription.ConnectionChannel interface. In
+// this case the error ErrNotValidChannel is returned.
 func (c *Commands) ConnectionChannel(indata any) (subscription.ConnectionChannel, error) {
 	req, err := ParseParams[RequestInterface](indata)
 	if err != nil {
 		return nil, err
 	}
-	return req.GetConnectionChannel(), nil
+
+	con := req.GetConnectionChannel()
+	if con == nil {
+		return nil, ErrNotValidChannel
+	}
+
+	return con, nil
 }
 
 // SetDate sets date in responce. Used in HTTP request and set custom date to

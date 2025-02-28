@@ -15,6 +15,7 @@ import (
 // ErrIncorrectInputData is an error returned when the input data provided is
 // incorrect.
 var ErrIncorrectInputData = fmt.Errorf("inclorrect input data")
+var ErrNotValidChannel = fmt.Errorf("not valid connection channel")
 
 // Commands is a struct that contains a map of command data and a read-write
 // mutex for synchronizing access to the map.
