@@ -7,6 +7,7 @@ package subscription
 
 import (
 	"encoding/json"
+	"iter"
 	"log"
 	"sync"
 
@@ -250,4 +251,18 @@ func (s *Subscription) DataConCmd(con ConnectionChannel, command string) any {
 		return action.Data
 	}
 	return nil
+}
+
+// Iter returns an iterator for all subscribed commands.
+func (s *Subscription) Iter() iter.Seq[string] {
+	return func(yield func(string) bool) {
+		s.mut.RLock()
+		defer s.mut.RUnlock()
+
+		for command := range s.ActionsMap {
+			if !yield(string(command)) {
+				return
+			}
+		}
+	}
 }
