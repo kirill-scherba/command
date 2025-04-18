@@ -6,7 +6,10 @@
 
 package command
 
-import "strings"
+import (
+	"io"
+	"strings"
+)
 
 // CommandData represents a command that can be executed by the Commands
 // struct. It contains the command name, the input processing types, the
@@ -24,7 +27,7 @@ type CommandData struct {
 }
 
 // CommandHandler is a function that handles a command.
-type CommandHandler func(cmd *CommandData, processIn ProcessIn, data any) ([]byte, error)
+type CommandHandler func(cmd *CommandData, processIn ProcessIn, data any) (io.Reader, error)
 
 // ParamsSlice returns a slice of parameters from the CommandData struct.
 //

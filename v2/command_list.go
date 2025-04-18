@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"html/template"
+	"io"
 	"sort"
 )
 
@@ -38,7 +39,7 @@ func (c *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 	// handler converts input data to map[string]string and use it in
 	// commandsListHandler
 	handler := func(command *CommandData, processIn ProcessIn, indata any) (
-		[]byte, error) {
+		io.Reader, error) {
 
 		vars, err := c.Vars(indata)
 		if err != nil {
@@ -50,7 +51,7 @@ func (c *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 	// handlerJson converts input data to map[string]string and use it in
 	// commandsListHandler
 	handlerJson := func(command *CommandData, processIn ProcessIn, indata any) (
-		[]byte, error) {
+		io.Reader, error) {
 
 		return c.commandsJsonHandler()
 	}
@@ -69,7 +70,7 @@ func (c *Commands) AddCommandsList(processIn ProcessIn, setFieldsets ...bool) {
 }
 
 // commandsJsonHandler returns array of commands in json format.
-func (c *Commands) commandsJsonHandler() ([]byte, error) {
+func (c *Commands) commandsJsonHandler() (io.Reader, error) {
 
 	// Output array of commands
 	var list []commandsListItem
@@ -87,11 +88,15 @@ func (c *Commands) commandsJsonHandler() ([]byte, error) {
 		return list[i].Command < list[j].Command
 	})
 
-	return json.Marshal(list)
+	data, err := json.Marshal(list)
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewReader(data), nil
 }
 
 // commandsHttpHandler returns list of commands in html format.
-func (c *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string) ([]byte, error) {
+func (c *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string) (io.Reader, error) {
 
 	var fieldset string
 
@@ -235,5 +240,5 @@ func (c *Commands) commandsHttpHandler(setFieldset bool, vars map[string]string)
 	tmpl := template.Must(template.New("list").Parse(t))
 	tmpl.Execute(buf, page)
 
-	return buf.Bytes(), nil
+	return buf, nil
 }

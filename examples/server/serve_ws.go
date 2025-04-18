@@ -7,8 +7,10 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -80,12 +82,22 @@ func (s *ServeWs) processMessage(conn *websocket.Conn, message []byte) {
 
 	// Execute command
 	log.Println("executing command:", name, vars)
-	res, err := s.c.Exec(name, command.WS, &WsRequest{Conn: conn, Vars: vars})
+	reader, err := s.c.Exec(name, command.WS, &WsRequest{Conn: conn, Vars: vars})
 	if err != nil {
 		log.Println("failed to execute command:", err)
-		res = []byte(err.Error())
+		reader = strings.NewReader(err.Error())
+	}
+
+	// Get writer
+	writer, err := conn.NextWriter(websocket.TextMessage)
+	if err != nil {
+		log.Println("failed to get ws writer:", err)
+		return
 	}
 
 	// Write answer
-	s.conn.WriteMessage(websocket.TextMessage, res)
+	_, err = io.Copy(writer, reader)
+	if err != nil {
+		log.Println("failed to write answer:", err)
+	}
 }

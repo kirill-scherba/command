@@ -8,6 +8,7 @@ package command
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"iter"
 	"sync"
 )
@@ -91,17 +92,29 @@ func (c *Commands) Del(name string) {
 // - data: The data to pass to the command handler.
 //
 // Returns:
-// - []byte: The result of the command execution.
+// - io.Reader: The result of the command execution reader.
 // - error: An error if the command is not found.
 func (c *Commands) Exec(command string, processIn ProcessIn, data any) (
-	[]byte, error) {
+	io.Reader, error) {
 
 	// Get the command from the commands map by name.
 	cmd, ok := c.Get(command)
 
 	// If the command is found and has a handler, execute the handler.
 	if ok && cmd.Handler != nil {
-		return cmd.Handler(cmd, processIn, data)
+
+		// Execute the handler
+		r, err := cmd.Handler(cmd, processIn, data)
+		if err != nil {
+			return nil, err
+		}
+
+		// Make empty reader
+		if r == nil {
+			return bytes.NewReader([]byte{}), nil
+		}
+
+		return r, nil
 	}
 
 	// If the command is not found, return an error.

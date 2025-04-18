@@ -7,6 +7,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -53,14 +54,14 @@ func serve(c *command.Commands) {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 
 			// Execute command
-			data, err := c.Exec(name, command.HTTP, request)
+			reader, err := c.Exec(name, command.HTTP, request)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 
 			// Write response
-			w.Write([]byte(data))
+			io.Copy(w, reader)
 		})
 
 	})

@@ -9,7 +9,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"strings"
 
 	"github.com/kirill-scherba/command/v2"
 )
@@ -63,7 +65,7 @@ func commands(c *command.Commands) {
 	// Add 'hello' commands
 	c.Add("hello", "say hello", command.HTTP|command.WS, "{name}", "", "", "",
 		func(cmd *command.CommandData, processIn command.ProcessIn, data any) (
-			[]byte, error) {
+			io.Reader, error) {
 
 			log.Println("executing command 1: hello", data)
 
@@ -74,16 +76,16 @@ func commands(c *command.Commands) {
 
 			log.Println("executing command 2: hello", data, vars)
 
-			return []byte(fmt.Sprintf("Hello %s!", vars["name"])), nil
+			return strings.NewReader(fmt.Sprintf("Hello %s!", vars["name"])), nil
 		},
 	)
 
 	// Add 'version' commands
 	c.Add("version", "get application version", command.HTTP|command.WS, "", "", "", "",
 		func(cmd *command.CommandData, processIn command.ProcessIn, data any) (
-			[]byte, error) {
+			io.Reader, error) {
 
-			return []byte(appVersion), nil
+			return strings.NewReader(appVersion), nil
 		},
 	)
 

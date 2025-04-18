@@ -2,6 +2,8 @@ package command
 
 import (
 	"fmt"
+	"io"
+	"strings"
 	"testing"
 )
 
@@ -9,8 +11,8 @@ func TestParseCommand(t *testing.T) {
 
 	c := New()
 	c.Add("test", "test", HTTP, "{param1}/{param2}/{param3}", "", "", "",
-		func(cmd *CommandData, processIn ProcessIn, data any) ([]byte, error) {
-			return []byte("test"), nil
+		func(cmd *CommandData, processIn ProcessIn, data any) (io.Reader, error) {
+			return strings.NewReader("test"), nil
 		},
 	)
 
