@@ -10,8 +10,6 @@ import (
 	"iter"
 	"log"
 	"sync"
-
-	"github.com/teonet-go/teogw"
 )
 
 // Subscription type stores subscribers.
@@ -59,6 +57,15 @@ type ConnectionChannel interface {
 	GetUser() any
 	SetUser(user any)
 	Send(data []byte) error
+}
+
+// Teogw packet data
+type TeogwData struct {
+	ID      uint32 `json:"id"`
+	Address string `json:"address"`
+	Command string `json:"command"`
+	Data    []byte `json:"data"`
+	Err     string `json:"err"`
 }
 
 // New creates new Subscription object.
@@ -168,7 +175,7 @@ func (s *Subscription) ExecCmd(command string) {
 				len(data))
 
 			// Marshal data
-			d, _ := json.Marshal(teogw.TeogwData{
+			d, _ := json.Marshal(TeogwData{
 				Command: command,
 				Data:    data,
 				Err: func(err error) (errStr string) {
@@ -203,7 +210,7 @@ func (s *Subscription) ExecConCmd(con ConnectionChannel, command string) {
 	log.Printf("process command: %s, data len: %d\n", action.Command, len(data))
 
 	// Marshal data
-	d, _ := json.Marshal(teogw.TeogwData{
+	d, _ := json.Marshal(TeogwData{
 		Command: command,
 		Data:    data,
 		Err: func(err error) (errStr string) {
