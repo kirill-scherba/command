@@ -9,12 +9,13 @@ package command
 import "strings"
 
 const (
-	HTTP   ProcessIn = 1 << iota // HTTP request
-	TRU                          // TRU request
-	WebRTC                       // WebRTC request
-	Teonet                       // Teonet request
-	WS                           // Websocket request
-	All    = HTTP | TRU | WebRTC | Teonet | WS
+	HTTP         ProcessIn = 1 << iota // HTTP request
+	TRU                                // TRU request
+	WebRTC                             // WebRTC request
+	Teonet                             // Teonet request
+	WS                                 // Websocket request
+	WebTransport                       // Webtransport request
+	All          = HTTP | TRU | WebRTC | Teonet | WS | WebTransport
 )
 
 // ProcessIn represents the source of a command.
@@ -55,6 +56,11 @@ func (pi ProcessIn) String() string {
 	// Websocket source
 	if pi&WS != 0 {
 		sb.WriteString("Websocket, ")
+	}
+
+	// Webtransport source
+	if pi&WebTransport != 0 {
+		sb.WriteString("WebTransport, ")
 	}
 
 	// Get the result string from the strings.Builder.
